@@ -1,0 +1,43 @@
+- name: Create a10.acos_axapi.a10_slb_server example playbook
+  connection: local
+  hosts: a10-a
+  tasks:
+  - name: Configure Servers and Service Group
+    a10.acos_axapi.a10_slb_service_group:
+      ansible_host: "a10-a"
+      ansible_username: {{ userName }}
+      ansible_password: {{ passWord }}
+      ansible_port: 443
+      protocol: tcp
+      member_list:
+      {% for s in serversList %}
+      {% if s.ip %}
+        - host: {{ s.ip }}
+          name: {{ s.name }}
+      {% else %}
+        - name: {{ s.name }}
+      {% endif %}
+          port: {{ s.port }}
+      {% endfor %}
+      lb_method: {{ lbMethod }}
+      name: {{ sgName }}
+
+  - name: Configure Virtual Server
+    a10.acos_axapi.a10_slb_virtual_server:
+      ansible_host: "a10-a"
+      ansible_username: {{ userName }}
+      ansible_password: {{ passWord }}
+      ansible_port: 443
+      state: present
+      name: {{ vipName }}
+      ip_address: {{ vipIP }}
+      netmask: {{ vipMask }}
+      enable_disable_action: enable
+      stats_data_action: stats-data-enable
+      port_list:
+        - name: {{ vipPortName }}
+          protocol: {{ vipProto }}
+          port_number: {{ vipPort }}
+          action: enable
+          pool: SNAT
+          service_group: {{ sgName }}

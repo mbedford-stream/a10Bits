@@ -1,0 +1,69 @@
+- name: Create a10.acos_axapi.a10_slb_server example playbook
+  connection: local
+  hosts: a10-a
+  tasks:
+  - name: Configure Servers and Service Group
+    a10.acos_axapi.a10_slb_service_group:
+      ansible_host: "a10-a"
+      ansible_username: apiuser
+      ansible_password: abc123
+      ansible_port: 443
+      protocol: tcp
+      member_list:
+      
+      
+        - host: 10.10.20.12
+          name: web-12
+      
+          port: 80
+      
+      
+        - host: 10.10.20.15
+          name: web-15
+      
+          port: 80
+      
+      
+        - host: 10.10.20.85
+          name: web-85
+      
+          port: 80
+      
+      
+        - host: 10.10.20.28
+          name: web-28
+      
+          port: 80
+      
+      
+        - name: Its-23_Silly
+      
+          port: 80
+      
+      
+        - name: web-228
+      
+          port: 80
+      
+      lb_method: round-robin
+      name: test_SG_automated
+
+  - name: Configure Virtual Server
+    a10.acos_axapi.a10_slb_virtual_server:
+      ansible_host: "a10-a"
+      ansible_username: apiuser
+      ansible_password: abc123
+      ansible_port: 443
+      state: present
+      name: test_VIP_automated
+      ip_address: 172.16.0.253
+      netmask: /32
+      enable_disable_action: enable
+      stats_data_action: stats-data-enable
+      port_list:
+        - name: test_Service_Automated
+          protocol: http
+          port_number: 80
+          action: enable
+          pool: SNAT
+          service_group: test_SG_automated

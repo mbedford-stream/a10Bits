@@ -1,0 +1,7 @@
+[ACOS]
+a10-a
+
+[ACOS:vars]
+ansible_username=admin
+ansible_password=a10
+ansible_port=22
